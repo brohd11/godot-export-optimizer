@@ -1,4 +1,6 @@
 export_root: "res://addons/export_optimizer/export_ignore/exports"
+build_require: @require
+compile_require: ["brohd11/godot-yaml-parser@v2.1.0"]
 plugin_folder: "ExportOptimizer/ExportOptimizer{{version=export_optimizer}}"
 exports:
   - source: "res://addons/export_optimizer"
@@ -19,4 +21,3 @@ options:
     parse_cs: {}
     parse_tscn: {}
     parse_tres: {}
-
