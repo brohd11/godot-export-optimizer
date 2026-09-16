@@ -2,7 +2,7 @@
 
 Enable **Export Optimizer** in Project Settings → Plugins. In Project → Export,
 enable **Optimization → Structs** for tagged data classes or **Optimization → Inline
-Functions** for tagged static arithmetic helpers. Both options default off and apply
+Functions** for tagged static helpers. Both options default off and apply
 to debug and release exports. When both are enabled, structs run first.
 Godot stores it in `export_presets.cfg`.
 
@@ -19,18 +19,20 @@ exported. Godot may still return a successful command-line exit code; this is no
 a strict CI validation gate. Unsupported inline definitions/calls remain unchanged
 with warnings. The log reports applied/skipped inline source-site counts.
 
-Use `#! inline` above a top-level `static func` with explicit built-in value
-parameter/return types. Simple numeric expressions still use direct substitution.
-Straight-line bodies with local declarations/assignments and a final return use
-fresh typed argument locals when the call is the whole expression in a local
-declaration, simple assignment, or return. Calls and property reads can supply
-arguments; their evaluation order is preserved. The log reports direct/expanded
-counts separately. Original function definitions remain available.
+Use `#! inline` above a top-level `static func` with explicit supported types.
+Simple numeric expressions retain direct substitution. Larger templates choose direct
+substitution or typed local capture per argument, using parameter reference counts,
+argument shape, rebinding and mutation. Calls/getters/indexes evaluate once in order;
+reference ownership and local lifetimes are preserved. Supported bodies include local
+assignments and exhaustive terminal if/elif/else return trees.
 
-Collections, objects, Variant declarations, control flow, defaults, script-member
-references inside imported bodies, and nested inlining remain deferred. See the
-shared [optimizer documentation](../addon_lib/gdscript_optimizer/README.md) for the
-supported types and syntax.
+Array/Dictionary, typed RefCounted-derived objects, tagged structs, and immutable value
+default arguments are supported. With both passes enabled, inline analysis and cross-file
+resolution use the in-memory struct output. Original definitions remain available.
+The log reports direct/expanded sites, substituted/captured arguments, and repeated
+access captures. See the shared [optimizer documentation](../addon_lib/gdscript_optimizer/README.md)
+for exact types, syntax, and conservative fallback rules.
+
 This option is currently exposed by project export only; PluginExporter continues
 to select its existing struct pass.
 

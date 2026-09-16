@@ -37,9 +37,11 @@ func _export_begin(_features:PackedStringArray, _is_debug:bool, _path:String, _f
 	_preflight.prepare(sources, classes, passes)
 	var platform = get_export_platform()
 	if get_option(INLINE_OPTION) and _preflight.errors.is_empty():
-		print("Export Optimizer: inline calls applied=%d skipped=%d direct=%d expanded=%d" % [
+		print("Export Optimizer: inline calls applied=%d skipped=%d direct=%d expanded=%d substituted_args=%d captured_args=%d repeated_access_captures=%d" % [
 			_preflight.stats.get("inline_calls", 0), _preflight.stats.get("inline_skipped", 0),
-			_preflight.stats.get("inline_direct_calls", 0), _preflight.stats.get("inline_expanded_calls", 0)])
+			_preflight.stats.get("inline_direct_calls", 0), _preflight.stats.get("inline_expanded_calls", 0),
+			_preflight.stats.get("inline_substituted_args", 0), _preflight.stats.get("inline_captured_args", 0),
+			_preflight.stats.get("inline_repeated_access_captures", 0)])
 	for warning in _preflight.warnings:
 		platform.add_message(EditorExportPlatform.EXPORT_MESSAGE_WARNING, "Export Optimizer", warning)
 	for error in _preflight.errors:
