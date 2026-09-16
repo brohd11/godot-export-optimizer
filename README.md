@@ -6,6 +6,24 @@ Functions** for tagged static helpers. Both options default off and apply
 to debug and release exports. When both are enabled, structs run first.
 Godot stores it in `export_presets.cfg`.
 
+With **Structs** enabled, **Scalar Replacement** removes eligible local struct
+allocations, and **Struct Read Types** selects **Off**, **Typed Locals**, or **As
+Casts** for surviving field reads. Both default off. They are independent of function
+inlining; settings without Structs are inactive and produce a warning.
+
+Scalar replacement supports non-escaping locals with proven built-in value fields,
+including `:=` fields, vectors, strings, and transforms. Aliases, whole-struct calls
+or returns, lambda captures, reference/dynamic fields, and coroutine lifetimes retain
+the Array representation. Constructors must be single-line direct calls with supported
+value parameters and literal/value-constructor defaults. Calls that only become local
+after inlining are deferred.
+
+Typed Locals captures safe reads before a statement. As Casts keeps each read at its
+original position and restores its expression type with `as T`; the cast has runtime
+cost. Writes and value-component writeback paths are never cast. Complex captures,
+multiline statements, and inline lambda/semicolon statements are conservatively skipped.
+Off retains the existing `:=` type repair. Export logs include applied and skipped counts.
+
 The plugin uses `addons/addon_lib/gdscript_optimizer`; release packaging vendors the
 shared dependencies through PluginExporter. It requires Godot 4.6 or newer.
 
@@ -49,4 +67,12 @@ Validation:
 ```sh
 godot --headless --path . --script res://tests/export_optimizer/run_headless.gd
 python3 tests/export_optimizer/export_smoke.py --godot /path/to/godot
+python3 tests/export_optimizer/benchmark.py --godot /path/to/godot
 ```
+
+The benchmark compares original objects, existing struct lowering, both read modes,
+and scalar replacement, with inlining on/off. It checks equal results before measuring,
+warms up each workload, rotates variant order, and saves generated sources, logs, raw
+samples, and a Markdown report in a temporary directory. Use `--iterations`, `--samples`,
+and `--output` to configure a run. `--release-runtime /path/to/template` measures a matching
+release runtime; otherwise results are explicitly labeled as editor measurements.

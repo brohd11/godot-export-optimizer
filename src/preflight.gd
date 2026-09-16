@@ -10,10 +10,18 @@ var warnings:Array = []
 var stats:Dictionary = {}
 
 
-func prepare(sources:Dictionary, classes:Dictionary, passes:Array = [Optimizer.StructPass]) -> void:
+func prepare(sources:Dictionary, classes:Dictionary, passes:Array = [Optimizer.StructPass], options:Dictionary = {}) -> void:
 	clear()
 	var context = Optimizer.Context.new()
 	context.set_global_classes(classes)
+	context.scalar_replacement = options.get("scalar_replacement", false)
+	var read_mode:int = options.get("struct_read_types", 0)
+	if read_mode < 0 or read_mode > 2:
+		errors.append("Unknown struct read type mode: %d" % read_mode)
+		return
+	context.struct_read_types = read_mode as Optimizer.Context.StructReadTypes
+	if Optimizer.StructPass not in passes and (context.scalar_replacement or read_mode != 0):
+		warnings.append("Scalar replacement and struct read types require Optimization > Structs; options are inactive.")
 	var optimizer = Optimizer.new()
 	var result = optimizer.prepare(sources, context, passes)
 	errors.append_array(result.errors)
