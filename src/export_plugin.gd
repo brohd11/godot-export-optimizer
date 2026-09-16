@@ -3,6 +3,7 @@ extends EditorExportPlugin
 
 const Preflight = preload("res://addons/export_optimizer/src/preflight.gd")
 const OPTION = "optimization/structs"
+const INLINE_OPTION = "optimization/inline_functions"
 
 var _preflight = Preflight.new()
 
@@ -13,27 +14,39 @@ func _get_name() -> String:
 
 
 func _get_export_options(_platform:EditorExportPlatform) -> Array[Dictionary]:
-	return [{"option": {"name": OPTION, "type": TYPE_BOOL}, "default_value": false}]
+	return [
+		{"option": {"name": OPTION, "type": TYPE_BOOL}, "default_value": false},
+		{"option": {"name": INLINE_OPTION, "type": TYPE_BOOL}, "default_value": false},
+	]
 
 
 func _export_begin(_features:PackedStringArray, _is_debug:bool, _path:String, _flags:int) -> void:
 	_preflight.clear()
-	if not get_option(OPTION):
+	var passes:Array = []
+	if get_option(OPTION):
+		passes.append(Preflight.Optimizer.StructPass)
+	if get_option(INLINE_OPTION):
+		passes.append(Preflight.Optimizer.InlinePass)
+	if passes.is_empty():
 		return
 	var sources:Dictionary = {}
 	_collect(EditorInterface.get_resource_filesystem().get_filesystem(), sources)
 	var classes:Dictionary = {}
 	for entry in ProjectSettings.get_global_class_list():
 		classes[entry.class] = entry.path
-	_preflight.prepare(sources, classes)
+	_preflight.prepare(sources, classes, passes)
 	var platform = get_export_platform()
+	if get_option(INLINE_OPTION) and _preflight.errors.is_empty():
+		print("Export Optimizer: inline calls applied=%d skipped=%d direct=%d expanded=%d" % [
+			_preflight.stats.get("inline_calls", 0), _preflight.stats.get("inline_skipped", 0),
+			_preflight.stats.get("inline_direct_calls", 0), _preflight.stats.get("inline_expanded_calls", 0)])
 	for warning in _preflight.warnings:
-		platform.add_message(EditorExportPlatform.EXPORT_MESSAGE_WARNING, "Struct optimizer", warning)
+		platform.add_message(EditorExportPlatform.EXPORT_MESSAGE_WARNING, "Export Optimizer", warning)
 	for error in _preflight.errors:
-		platform.add_message(EditorExportPlatform.EXPORT_MESSAGE_ERROR, "Struct optimizer", error)
+		platform.add_message(EditorExportPlatform.EXPORT_MESSAGE_ERROR, "Export Optimizer", error)
 	if not _preflight.errors.is_empty():
-		platform.add_message(EditorExportPlatform.EXPORT_MESSAGE_ERROR, "Struct optimizer",
-			"Struct optimization failed preflight. Exporting original code; no optimizations were applied.")
+		platform.add_message(EditorExportPlatform.EXPORT_MESSAGE_ERROR, "Export Optimizer",
+			"Optimization failed preflight. Exporting original code; no optimizations were applied.")
 
 
 func _export_file(path:String, _type:String, _features:PackedStringArray) -> void:

@@ -7,14 +7,15 @@ const Optimizer = preload("res://addons/export_optimizer/src/utils_remote.gd").O
 var replacements:Dictionary = {}
 var errors:Array = []
 var warnings:Array = []
+var stats:Dictionary = {}
 
 
-func prepare(sources:Dictionary, classes:Dictionary) -> void:
+func prepare(sources:Dictionary, classes:Dictionary, passes:Array = [Optimizer.StructPass]) -> void:
 	clear()
 	var context = Optimizer.Context.new()
 	context.set_global_classes(classes)
 	var optimizer = Optimizer.new()
-	var result = optimizer.prepare(sources, context)
+	var result = optimizer.prepare(sources, context, passes)
 	errors.append_array(result.errors)
 	warnings.append_array(result.warnings)
 	if not errors.is_empty():
@@ -27,6 +28,9 @@ func prepare(sources:Dictionary, classes:Dictionary) -> void:
 			continue
 		var source = file.get_as_text()
 		var edited = optimizer.apply(key, Array(source.split("\n")))
+		warnings.append_array(edited.get("warnings", []))
+		for name:String in edited.get("stats", {}):
+			stats[name] = stats.get(name, 0) + edited.stats[name]
 		for error in edited.errors:
 			errors.append("%s: %s" % [sources[key], error])
 		var text = "\n".join(edited.lines)
@@ -40,4 +44,4 @@ func clear() -> void:
 	replacements = {}
 	errors = []
 	warnings = []
-
+	stats = {}
