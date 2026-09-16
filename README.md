@@ -9,7 +9,10 @@ structs: true
 inline_functions: true
 scalar_replacement: true
 struct_read_types: typed_locals # off | typed_locals | as_casts
-allow_ref_counted: false
+scalar_replacement_allow_ref_counted: false
+struct_read_types_allow_ref_counted: false
+inline_functions_allow_ref_counted: false
+inline_functions_allow_variants: false
 ```
 
 A config overrides only the keys it contains. Paths may be `res://` or relative to the
@@ -28,8 +31,9 @@ or returns, lambda captures, dynamic fields, and coroutine lifetimes retain the 
 representation. Constructors must be single-line direct calls with supported parameters
 and defaults. Calls that only become local after inlining are deferred.
 
-`allow_ref_counted: true` additionally admits reference types in scalar locals and field
-reads: Object/Node/RefCounted subclasses, custom classes, collections, packed arrays,
+`scalar_replacement_allow_ref_counted: true` and
+`struct_read_types_allow_ref_counted: true` independently admit reference types in scalar
+locals and field reads: Object/Node/RefCounted subclasses, custom classes, collections, packed arrays,
 Callable, Signal, and nested structs. It can extend reference lifetimes and introduce
 assignment/cast checks on freed objects. It does not relax escape or evaluation-order
 checks, or change inline eligibility. Unknown and unrepresentable types remain skipped.
@@ -74,8 +78,9 @@ The log reports direct/expanded sites, substituted/captured arguments, and repea
 access captures. See the shared [optimizer documentation](../addon_lib/gdscript_optimizer/README.md)
 for exact types, syntax, and conservative fallback rules.
 
-This option is currently exposed by project export only; PluginExporter continues
-to select its existing struct pass.
+PluginExporter also supports these passes through the embedded `optimizer` block in
+its `plugin_export.yml`, including an `enabled` master toggle. Its settings are independent
+of project-export presets.
 
 Changed scripts are stored as `.gd` source in the package. Unchanged scripts follow
 the preset's format. Binary-token output for changed scripts is deferred; the source
@@ -100,3 +105,13 @@ warms up each workload, rotates variant order, and saves generated sources, logs
 samples, and a Markdown report in a temporary directory. Use `--iterations`, `--samples`,
 and `--output` to configure a run. `--release-runtime /path/to/template` measures a matching
 release runtime; otherwise results are explicitly labeled as editor measurements.
+
+Direct inlining supports single-return boolean/comparison expressions and String
+`begins_with`, `ends_with`, `contains`, and `is_empty` predicates, including conditional
+call sites. Arguments must be literals or locals; no conditional temporaries are introduced.
+`inline_functions_allow_ref_counted` permits direct reference member/index access and
+method calls without parameter lifetime protection. `inline_functions_allow_variants`
+permits unchecked Variant substitution, removing signature checks/conversions; unknown
+runtime values may include references. Known reference types still require their own opt-in.
+Both flags default to false and leave existing template expansion rules unchanged.
+The old `allow_ref_counted` key is rejected; replace it with the two struct flags above.

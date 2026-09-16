@@ -15,7 +15,10 @@ func prepare(sources:Dictionary, classes:Dictionary, passes:Array = [Optimizer.S
 	var context = Optimizer.Context.new()
 	context.set_global_classes(classes)
 	context.scalar_replacement = options.get("scalar_replacement", false)
-	context.allow_ref_counted = options.get("allow_ref_counted", false)
+	context.scalar_replacement_allow_ref_counted = options.get("scalar_replacement_allow_ref_counted", false)
+	context.struct_read_types_allow_ref_counted = options.get("struct_read_types_allow_ref_counted", false)
+	context.inline_functions_allow_ref_counted = options.get("inline_functions_allow_ref_counted", false)
+	context.inline_functions_allow_variants = options.get("inline_functions_allow_variants", false)
 	var read_mode:int = options.get("struct_read_types", 0)
 	if read_mode < 0 or read_mode > 2:
 		errors.append("Unknown struct read type mode: %d" % read_mode)

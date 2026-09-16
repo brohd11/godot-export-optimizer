@@ -3,6 +3,10 @@ structs: true
 inline_functions: true
 scalar_replacement: true
 struct_read_types: typed_locals # off | typed_locals | as_casts
-# Allows reference captures in scalar replacement and field-read typing.
+# Each opt-in affects only the named optimization.
 # Can extend reference lifetimes and introduce checks on freed objects.
-allow_ref_counted: false
+scalar_replacement_allow_ref_counted: false
+struct_read_types_allow_ref_counted: false
+# Direct inline opt-ins can remove lifetime protection and signature conversions.
+inline_functions_allow_ref_counted: false
+inline_functions_allow_variants: false
