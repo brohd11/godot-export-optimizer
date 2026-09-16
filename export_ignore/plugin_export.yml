@@ -1,0 +1,22 @@
+export_root: "res://addons/export_optimizer/export_ignore/exports"
+plugin_folder: "ExportOptimizer/ExportOptimizer{{version=export_optimizer}}"
+exports:
+  - source: "res://addons/export_optimizer"
+    export_name: "export-optimizer{{version=export_optimizer}}"
+    export_folder: "addons/export_optimizer"
+    remote_dir: "res://addons/export_optimizer/src/remote"
+    exclude:
+      directories: ["res://addons/export_optimizer/export_ignore"]
+      file_extensions: []
+      files: []
+    other_transfers: []
+options:
+  overwrite: true
+  include_uid: true
+  include_import: false
+  parser_settings:
+    parse_gd: {}
+    parse_cs: {}
+    parse_tscn: {}
+    parse_tres: {}
+
