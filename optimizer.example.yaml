@@ -1,6 +1,7 @@
 # Leave Config File blank to use these defaults, or select a copy of this file.
 structs: true
 inline_functions: true
+debug_tags: false
 scalar_replacement: true
 struct_read_types: typed_locals # off | typed_locals | as_casts
 # Each opt-in affects only the named optimization.

@@ -14,6 +14,7 @@ func prepare(sources:Dictionary, classes:Dictionary, passes:Array = [Optimizer.S
 	clear()
 	var context = Optimizer.Context.new()
 	context.set_global_classes(classes)
+	context.debug_tags = options.get("debug_tags", false)
 	context.scalar_replacement = options.get("scalar_replacement", false)
 	context.scalar_replacement_allow_ref_counted = options.get("scalar_replacement_allow_ref_counted", false)
 	context.struct_read_types_allow_ref_counted = options.get("struct_read_types_allow_ref_counted", false)
