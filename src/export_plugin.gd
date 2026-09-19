@@ -32,9 +32,9 @@ func _export_begin(_features:PackedStringArray, _is_debug:bool, _path:String, _f
 		return
 	var options:Dictionary = config.options
 	var passes:Array = []
-	if options.structs:
+	if options.struct_mode != "off":
 		passes.append(Preflight.Optimizer.StructPass)
-	if options.inline_functions:
+	if options.inline_mode != "off":
 		passes.append(Preflight.Optimizer.InlinePass)
 	var sources:Dictionary = {}
 	_collect(EditorInterface.get_resource_filesystem().get_filesystem(), sources)
@@ -42,9 +42,9 @@ func _export_begin(_features:PackedStringArray, _is_debug:bool, _path:String, _f
 	for entry in ProjectSettings.get_global_class_list():
 		classes[entry.class] = entry.path
 	_preflight.prepare(sources, classes, passes, options)
-	if (options.scalar_replacement or options.struct_read_types != 0) and _preflight.errors.is_empty():
-		print("Export Optimizer: struct stats=" + JSON.stringify(_preflight.stats))
-	if options.inline_functions and _preflight.errors.is_empty():
+	if _preflight.errors.is_empty():
+		print("Export Optimizer: stats=" + JSON.stringify(_preflight.stats))
+	if options.inline_mode != "off" and _preflight.errors.is_empty():
 		print("Export Optimizer: inline calls applied=%d skipped=%d direct=%d expanded=%d substituted_args=%d captured_args=%d repeated_access_captures=%d" % [
 			_preflight.stats.get("inline_calls", 0), _preflight.stats.get("inline_skipped", 0),
 			_preflight.stats.get("inline_direct_calls", 0), _preflight.stats.get("inline_expanded_calls", 0),

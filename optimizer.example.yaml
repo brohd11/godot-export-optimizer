@@ -1,13 +1,5 @@
 # Leave Config File blank to use these defaults, or select a copy of this file.
-structs: true
-inline_functions: true
+struct_mode: tagged # auto | tagged | off
+inline_mode: tagged # auto | tagged | off
+aggressive: false
 debug_tags: false
-scalar_replacement: true
-struct_read_types: typed_locals # off | typed_locals | as_casts
-# Each opt-in affects only the named optimization.
-# Can extend reference lifetimes and introduce checks on freed objects.
-scalar_replacement_allow_ref_counted: false
-struct_read_types_allow_ref_counted: false
-# Direct inline opt-ins can remove lifetime protection and signature conversions.
-inline_functions_allow_ref_counted: false
-inline_functions_allow_variants: false

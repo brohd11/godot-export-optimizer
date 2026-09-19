@@ -14,21 +14,12 @@ func prepare(sources:Dictionary, classes:Dictionary, passes:Array = [Optimizer.S
 	clear()
 	var context = Optimizer.Context.new()
 	context.set_global_classes(classes)
-	context.debug_tags = options.get("debug_tags", false)
-	context.scalar_replacement = options.get("scalar_replacement", false)
-	context.scalar_replacement_allow_ref_counted = options.get("scalar_replacement_allow_ref_counted", false)
-	context.struct_read_types_allow_ref_counted = options.get("struct_read_types_allow_ref_counted", false)
-	context.inline_functions_allow_ref_counted = options.get("inline_functions_allow_ref_counted", false)
-	context.inline_functions_allow_variants = options.get("inline_functions_allow_variants", false)
-	var read_mode:int = options.get("struct_read_types", 0)
-	if read_mode < 0 or read_mode > 2:
-		errors.append("Unknown struct read type mode: %d" % read_mode)
+	errors.append_array(context.configure(options))
+	if not errors.is_empty():
 		return
-	context.struct_read_types = read_mode as Optimizer.Context.StructReadTypes
-	if Optimizer.StructPass not in passes and (context.scalar_replacement or read_mode != 0):
-		warnings.append("Scalar replacement and struct read types require structs: true; options are inactive.")
 	var optimizer = Optimizer.new()
 	var result = optimizer.prepare(sources, context, passes)
+	stats = optimizer.stats.duplicate()
 	errors.append_array(result.errors)
 	warnings.append_array(result.warnings)
 	if not errors.is_empty():
