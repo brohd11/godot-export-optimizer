@@ -38,7 +38,7 @@ Conditional helpers expand as `if`/`elif`/`else`, reusing the destination or at 
 local; conditional calls embedded in larger expressions stay calls. Static members retain
 their defining scope through the receiver, such as `Utils.Keys.TYPE_DELIM`.
 
-The plugin uses `addons/addon_lib/gdscript_optimizer`; release packaging vendors the
+The plugin uses `addons/_lib/gdscript_optimizer`; release packaging vendors the
 shared optimizer dependencies through PluginExporter. YAMLParser 2.1.0 is an install
 dependency declared by `require` in `plugin.cfg`; install it with the plugin.
 The plugin requires Godot 4.6 or newer.
@@ -64,7 +64,7 @@ Aggressive or explicitly substituting helpers also support references and collec
 Immutable value defaults are supported in both policies. With both passes enabled, inline analysis and cross-file
 resolution use the in-memory struct output. Original definitions remain available.
 The log reports direct/expanded sites, substituted/captured arguments, and repeated
-access captures. See the shared [optimizer documentation](../addon_lib/gdscript_optimizer/README.md)
+access captures. See the shared [optimizer documentation](../_lib/gdscript_optimizer/README.md)
 for exact types, syntax, and conservative fallback rules.
 
 PluginExporter also supports these passes through the embedded `optimizer` block in
@@ -92,7 +92,7 @@ aggressiveness varied. It checks equal results, rotates timed variants, and save
 sources, logs, raw samples, and a report. Use `--iterations`, `--samples`, and `--output`.
 `--release-runtime` selects a matching release runtime; otherwise timings use the editor.
 
-See the shared [optimizer documentation](../addon_lib/gdscript_optimizer/README.md) for
+See the shared [optimizer documentation](../_lib/gdscript_optimizer/README.md) for
 supported syntax, evaluation rules, defaults, and diagnostic counters.
 
 `debug_tags: true` adds searchable `# optimizer-inline;`, `# optimizer-struct;`,
