@@ -39,7 +39,7 @@ local; conditional calls embedded in larger expressions stay calls. Static membe
 their defining scope through the receiver, such as `Utils.Keys.TYPE_DELIM`.
 
 The plugin uses `addons/_lib/gdscript_optimizer`; release packaging vendors the
-shared optimizer dependencies through PluginExporter. YAMLParser 2.1.0 is an install
+shared optimizer dependencies through PackageExporter. YAMLParser 2.1.0 is an install
 dependency declared by `require` in `plugin.cfg`; install it with the plugin.
 The plugin requires Godot 4.6 or newer.
 
@@ -67,7 +67,7 @@ The log reports direct/expanded sites, substituted/captured arguments, and repea
 access captures. See the shared [optimizer documentation](../_lib/gdscript_optimizer/README.md)
 for exact types, syntax, and conservative fallback rules.
 
-PluginExporter also supports these passes through the embedded `optimizer` block in
+PackageExporter also supports these passes through the embedded `optimizer` block in
 its `plugin_export.yml`, including an `enabled` master toggle. Its settings are independent
 of project-export presets.
 
