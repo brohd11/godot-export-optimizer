@@ -82,9 +82,9 @@ plugins that replace these same files must not intercept them first.
 Validation:
 
 ```sh
-godot --headless --path . --script res://tests/export_optimizer/run_headless.gd
-python3 tests/export_optimizer/export_smoke.py --godot /path/to/godot
-python3 tests/export_optimizer/benchmark.py --godot /path/to/godot
+godot --headless --path . --script res://addons/export_optimizer/export_ignore/test/run_headless.gd
+python3 addons/export_optimizer/export_ignore/test/export_smoke.py --godot /path/to/godot
+python3 addons/export_optimizer/export_ignore/test/benchmark.py --godot /path/to/godot
 ```
 
 The benchmark compares original objects and tagged/auto optimization with inlining and
